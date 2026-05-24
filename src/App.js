@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const CITAS_POR_PAGINA = 10;
 
 const estadoCita = (cita) => cita.estado || 'Programada';
@@ -42,7 +42,7 @@ function App() {
   };
 
   const obtenerHistorial = () => {
-    axios.get(`${API_URL}/citas/historial`)
+    axios.get(`${API_URL}/citas/historial/${usuarioActivo.id}`)
       .then(res => setHistorial(res.data))
       .catch(err => console.error('Error historial:', err));
   };
@@ -107,6 +107,7 @@ function App() {
     const nuevaCita = {
       nombre_paciente: formulario.nombre,
       id_medico: seleccionado.id,
+      id_usuario: usuarioActivo.id,
       fecha: formulario.fecha,
       hora: formulario.hora
     };
@@ -129,7 +130,7 @@ function App() {
 
   const borrarCita = (id) => {
     if (window.confirm('¿Estas seguro de que deseas cancelar esta cita?')) {
-      axios.delete(`${API_URL}/citas/${id}`)
+      axios.delete(`${API_URL}/citas/${id}`, { data: { id_usuario: usuarioActivo.id } })
         .then(() => {
           mostrarMensaje('exito', 'Cita cancelada', 'La cita fue eliminada correctamente.');
           obtenerHistorial();
@@ -537,3 +538,4 @@ function App() {
 }
 
 export default App;
+
