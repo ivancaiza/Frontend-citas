@@ -96,7 +96,7 @@ function App() {
 
   const seleccionarMedico = (medico) => {
     setSeleccionado(medico);
-    setFormulario({ nombre: usuarioActivo?.usuario || '', fecha: '', hora: '' });
+    setFormulario({ nombre: '', fecha: '', hora: '' });
     setTimeout(() => {
       document.getElementById('agendar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
@@ -538,4 +538,5 @@ function App() {
 }
 
 export default App;
+
 
