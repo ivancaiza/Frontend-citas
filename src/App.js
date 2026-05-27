@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -24,28 +24,30 @@ function App() {
   const [modal, setModal] = useState(null);
   const [menuSesionAbierto, setMenuSesionAbierto] = useState(false);
 
-  useEffect(() => {
-    if (usuarioActivo) {
-      obtenerMedicos();
-      obtenerHistorial();
-    }
-  }, [usuarioActivo]);
-
-  useEffect(() => {
-    setPagina(1);
-  }, [filtros]);
-
   const obtenerMedicos = () => {
     axios.get(`${API_URL}/medicos`)
       .then(res => setMedicos(res.data))
       .catch(err => console.error('Error medicos:', err));
   };
 
-  const obtenerHistorial = () => {
+  const obtenerHistorial = useCallback(() => {
+    if (!usuarioActivo) return;
+
     axios.get(`${API_URL}/citas/historial/${usuarioActivo.id}`)
       .then(res => setHistorial(res.data))
       .catch(err => console.error('Error historial:', err));
-  };
+  }, [usuarioActivo]);
+
+  useEffect(() => {
+    if (usuarioActivo) {
+      obtenerMedicos();
+      obtenerHistorial();
+    }
+  }, [usuarioActivo, obtenerHistorial]);
+
+  useEffect(() => {
+    setPagina(1);
+  }, [filtros]);
 
   const mostrarMensaje = (tipo, titulo, mensaje) => {
     setModal({ tipo, titulo, mensaje });
